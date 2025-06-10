@@ -107,7 +107,7 @@ const Resume = () => {
         </div>
         )}
         {/* Awards Section */}
-        <div className="">
+        <div className="mb-4">
           <h2 className="text-lg font-bold mb-1">AWARDS</h2>
           <hr className="border-black border-t-2 mb-3" />
           {resumedata.awards.map((award)=>{

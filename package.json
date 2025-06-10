@@ -18,6 +18,8 @@
     "@mui/styled-engine-sc": "^7.1.0",
     "@tailwindcss/vite": "^4.1.8",
     "dotenv": "^16.5.0",
+    "file-saver": "^2.0.5",
+    "html-docx-js": "^0.3.1",
     "html2pdf.js": "^0.10.3",
     "lucide-react": "^0.512.0",
     "react": "^19.1.0",
