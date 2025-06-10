@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import Resume from './resume';
 import {useNavigate} from 'react-router-dom';
 import {GoogleGenAI} from '@google/genai'
 import { useEffect } from 'react';
