@@ -4,7 +4,6 @@ import {useNavigate} from 'react-router-dom';
 import {GoogleGenAI} from '@google/genai'
 import { useEffect } from 'react';
 
-import 'dotenv/config'
 export default function HomePage() {
 
     
@@ -64,7 +63,7 @@ export default function HomePage() {
   const stringifyCompleted = JSON.stringify(completed);
 
   console.log("completed object:", completed);
-const api=process.env.REACT_API_KEY
+const api=import.meta.env.VITE_API_KEY
 console.log(api)
    const ai = new GoogleGenAI({
     apiKey: api
@@ -91,7 +90,9 @@ The user will provide structured input that includes their name, contact info, s
 3. **skills**: Only use selectedTechnologies + obvious soft skills.
 4. **certifications**: Max 4, and **strictly related** to selectedTechnologies and it should be untracable by the interviewer.
 5. **summary**: Max 3–4 confident sentences.
-6. Return **ONLY valid JSON. No commentary. No \`\`\`json** markers.
+6.**personal_information**:email,name,phone,portfolio_link.
+7..**awards:max 4 points of awards name which should be matching to the profile like for an example:- i was best intern at my company ,lead some team in xyz company.
+8. Return **ONLY valid JSON. No commentary. No \`\`\`json** markers.
 
 ---
 

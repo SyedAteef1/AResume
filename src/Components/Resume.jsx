@@ -50,18 +50,19 @@ const Resume = () => {
         {/* Header Section */}
         <div className="text-center mb-6">
           <h1 className="text-xl font-bold mb-2">
-            {resumedata.personal_info.name} (exp: 1.5+ years)
+            {resumedata.personal_information.name} (exp: 1.5+ years)
           </h1>
-          <p>
-            Phone: {resumedata.personal_info.phone} | 
-            Email: {resumedata.personal_info.email} | 
-            Portfolio: {resumedata.personal_info.portfolio_link}
+          <p className='-mt-2'>
+            Phone: {resumedata.personal_information.phone} | 
+            Email: {resumedata.personal_information.email} | 
+            Portfolio: {resumedata.personal_information.portfolio_link}
           </p>
         </div>
 
         {/* Technical Skills Section */}
-        <div className="mb-6">
-          
+        <div className=" -mt-4">
+                    <hr className="border-black border-t-2 mb-3" />
+
           <p className="mb-2">
             <strong>Technical skills:-</strong> {resumedata.technical_skills.join(', ')}
           </p>
@@ -69,55 +70,55 @@ const Resume = () => {
 
 
         {/* Summary Section */}
-        <div className="mb-6">
+        <div className=" -mt-2">
           <h2 className="text-lg font-bold mb-3 text-center items-center">Summary</h2>
           <p className="mb-2 text-center">{resumedata.summary}</p>
         </div>
 
         {/* Experience Section */}
-        <div className="mb-6">
+        <div className="-mt-2">
           <h2 className="text-lg font-bold mb-1">EXPERIENCE/PROJECTS</h2>
           <hr className="border-black border-t-2 mb-3" />
           {resumedata.experience.map((exp, index) => (
-            <div key={index} className="mb-4">
+            <div key={index} className="-mt-2">
               <div className="flex justify-between items-start mb-1">
                 <h3 className="font-bold">{exp.company_name}</h3>
                 <span>{exp.duration}</span>
               </div>
               <div className="flex justify-between items-start mb-2">
                 <p className="italic">{exp.role}</p>
-                <span>Remote/Ballari, India</span>
+                {/* <span>Remote/Ballari, India</span> */}
               </div>
               {exp.description.map((des, i) => (
-                <p key={i}>• {des}</p>
+                <p key={i} className='-mt-0.5'>• {des}</p>
               ))}
             </div>
           ))}
         </div>
 
  {resumedata.certifications && (
-          <div className="mb-6">
+          <div className=" ">
           <h2 className="text-lg font-bold mb-1">Certificate</h2>
           <hr className="border-black border-t-2 mb-3" />
          {resumedata.certifications.map((certificate)=>{
               
-         return <p>• {certificate}</p>
+         return <p className='-mt-1'>• {certificate}</p>
           })}
         </div>
         )}
         {/* Awards Section */}
-        <div className="mb-6">
+        <div className="">
           <h2 className="text-lg font-bold mb-1">AWARDS</h2>
           <hr className="border-black border-t-2 mb-3" />
           {resumedata.awards.map((award)=>{
-            return <p>• {award}</p>
+            return <p className='-mt-1'>• {award}</p>
           })}
           <p></p>
         </div>
 
 
         {/* Education Section */}
-        <div className="mb-6">
+        <div className="">
           <h2 className="text-lg font-bold mb-1">EDUCATION</h2>
           <hr className="border-black border-t-2 mb-3" />
           <div className="flex justify-between items-start mb-1">
@@ -126,7 +127,7 @@ const Resume = () => {
           </div>
           <div className="flex justify-between items-start">
             <p className="italic">{resumedata.education.degree_name}</p>
-            <span>Ballari, Karnataka</span>
+            {/* <span>Ballari, Karnataka</span> */}
           </div>
         </div>
        
