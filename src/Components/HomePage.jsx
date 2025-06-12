@@ -62,7 +62,7 @@ export default function HomePage() {
   const stringifyCompleted = JSON.stringify(completed);
 
   console.log("completed object:", completed);
-const api=import.meta.env.VITE_API_KEY
+const api="AIzaSyBORb99_kIhY-muw0nzmGZzhelg5YmzJlw"
 console.log(api)
    const ai = new GoogleGenAI({
     apiKey: api
