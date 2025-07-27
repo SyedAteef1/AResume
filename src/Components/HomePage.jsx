@@ -11,19 +11,36 @@ export default function HomePage() {
         phone: '',
         email: '',
         portfolio_link: '',
+        linkedin: '',
+        github: '',
+        location: '',
         experiences: [
-            { company_name: '', role: '', duration: '', description: '' },
-            { company_name: '', role: '', duration: '', description: ''},
-            { company_name: '', role: '', duration: '', description: '' }
+            { company_name: '', role: '', duration: '', description: '', location: '' },
+            { company_name: '', role: '', duration: '', description: '', location: '' },
+            { company_name: '', role: '', duration: '', description: '', location: '' }
         ],
-        college_name: '',
-        degree_name: '',
-        edmon: '',
-        branch:'',
-        eduplace:'',
+        projects: [
+            { project_name: '', technologies: '', duration: '', description: '', github_link: '', live_link: '' },
+            { project_name: '', technologies: '', duration: '', description: '', github_link: '', live_link: '' }
+        ],
+        education: [
+            { 
+                college_name: '', 
+                degree_name: '', 
+                duration: '', 
+                branch: '', 
+                location: '', 
+                cgpa: '', 
+                relevant_coursework: '' 
+            }
+        ],
+        certifications: '',
+        languages: '',
+        soft_skills: '',
         awards: '',
-        assumedpro:{asssumedprojectname:'',assumedcollegename:'',assumedprojectdes:{point1:'',point2:'',point3:''},anydateundercollgedates:''},
-        mode: ''
+        mode: '',
+        objective: '',
+        years_of_experience: ''
     })
 
     const technologies = [
@@ -76,26 +93,63 @@ console.log(api)
           role: 'user',
           parts: [
             {
-              text: `You are an AI trained to generate complete resume content in structured JSON format.
+              text: `Generate a professional resume in JSON format based on the provided user data.
 
-The user will provide structured input that includes their name, contact info, selected technologies, experiences, projects, and education. You must return output in **JSON format only**, matching the schema below.
+REQUIRED JSON SCHEMA:
+{
+  "personal_information": {
+    "name": "string",
+    "phone": "string", 
+    "email": "string",
+    "portfolio_link": "string",
+    "linkedin": "string",
+    "github": "string",
+    "location": "string"
+  },
+  "objective": "string (2-3 sentences)",
+  "technical_skills": ["array of strings from selectedTech only"],
+  "soft_skills": ["array of 4-6 relevant soft skills"],
+  "experience": [
+    {
+      "company_name": "string",
+      "role": "string", 
+      "duration": "string",
+      "location": "string",
+      "description": ["array of 4-5 professional bullet points"]
+    }
+  ],
+  "projects": [
+    {
+      "project_name": "string",
+      "technologies": "string",
+      "duration": "string", 
+      "github_link": "string",
+      "live_link": "string",
+      "description": ["array of 3-4 bullet points"]
+    }
+  ],
+  "education": [
+    {
+      "college_name": "string",
+      "degree_name": "string",
+      "branch": "string",
+      "duration": "string",
+      "location": "string",
+      "cgpa": "string"
+    }
+  ],
+  "certifications": ["array of 3-4 relevant certifications"],
+  "languages": ["array of languages"],
+  "awards": ["array of 3-4 achievements"]
+}
 
----
+RULES:
+- Use ONLY selectedTech for technical_skills
+- Generate realistic, professional content
+- Keep descriptions concise and impactful
+- Return ONLY valid JSON, no markdown formatting
 
-🎯 Rules:
-
-1. **technical_skills** must be derived **only** from the variable \`selectedTechnologies\`. No inference.
-2. **experience**/**projects**: Keep only provided title, role, duration; generate 4–5 realistic bullet points.
-3. **skills**: Only use selectedTechnologies + obvious soft skills.
-4. **certifications**: Max 4, and **strictly related** to selectedTechnologies and it should be untracable by the interviewer.
-5. **summary**: Max 3–4 confident sentences.
-6.**personal_information**:email,name,phone,portfolio_link.
-7..**awards:max 4 points of awards name which should be matching to the profile like for an example:- i was best intern at my company ,lead some team in xyz company.
-8. Return **ONLY valid JSON. No commentary. No \`\`\`json** markers.
-
----
-
-Here is the user input: ${stringifyCompleted}`
+USER DATA: ${stringifyCompleted}`
             }
           ]
         }
@@ -130,7 +184,7 @@ Here is the user input: ${stringifyCompleted}`
     
     
     const handleNext = () => {
-        if (step < 4) {
+        if (step < 6) {
             setStep(prev => prev + 1)
         }
     }
@@ -166,12 +220,32 @@ Here is the user input: ${stringifyCompleted}`
         })
     }
 
+    const handleProjectChange = (index, field, value) => {
+        const updatedProjects = [...formData.projects]
+        updatedProjects[index][field] = value
+        setFormData({
+            ...formData,
+            projects: updatedProjects
+        })
+    }
+
+    const handleEducationChange = (index, field, value) => {
+        const updatedEducation = [...formData.education]
+        updatedEducation[index][field] = value
+        setFormData({
+            ...formData,
+            education: updatedEducation
+        })
+    }
+
     const isStepComplete = (stepNum) => {
         switch(stepNum) {
             case 1: return formData.name && formData.phone && formData.email
             case 2: return selectedTech.length > 0
             case 3: return formData.experiences.some(exp => exp.company_name && exp.role && exp.description)
-            case 4: return formData.college_name && formData.degree_name
+            case 4: return formData.projects.some(proj => proj.project_name && proj.description)
+            case 5: return formData.education.some(edu => edu.college_name && edu.degree_name)
+            case 6: return true // Optional step
             default: return false
         }
     }
@@ -179,10 +253,12 @@ Here is the user input: ${stringifyCompleted}`
     const canProceed = isStepComplete(step)
 
     const stepItems = [
-        { num: 1, title: "Personal Info", desc: "Basic details" },
+        { num: 1, title: "Personal Info", desc: "Basic details & contact" },
         { num: 2, title: "Technical Skills", desc: "Technologies you know" },
-        { num: 3, title: "Experience", desc: "Work history & awards" },
-        { num: 4, title: "Education", desc: "Academic background" }
+        { num: 3, title: "Experience", desc: "Work history" },
+        { num: 4, title: "Projects", desc: "Personal projects" },
+        { num: 5, title: "Education", desc: "Academic background" },
+        { num: 6, title: "Additional Info", desc: "Awards, certifications" }
     ]
 
     return (
@@ -277,27 +353,113 @@ Here is the user input: ${stringifyCompleted}`
                                                 />
                                             </div>
                                             
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                                    <input
+                                                        type="tel"
+                                                        name="phone"
+                                                        value={formData.phone}
+                                                        onChange={handleInputChange}
+                                                        placeholder="+91 98765-43210"
+                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                                    />
+                                                </div>
+                                                
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                                    <input
+                                                        type="email"
+                                                        name="email"
+                                                        value={formData.email}
+                                                        onChange={handleInputChange}
+                                                        placeholder="your.email@example.com"
+                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                                    />
+                                                </div>
+                                            </div>
+
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
                                                 <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    value={formData.phone}
+                                                    type="text"
+                                                    name="location"
+                                                    value={formData.location}
                                                     onChange={handleInputChange}
-                                                    placeholder="+91 98765-43210"
+                                                    placeholder="City, State, Country"
                                                     className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                                                 />
                                             </div>
-                                            
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn Profile</label>
+                                                    <input
+                                                        type="url"
+                                                        name="linkedin"
+                                                        value={formData.linkedin}
+                                                        onChange={handleInputChange}
+                                                        placeholder="https://linkedin.com/in/yourprofile"
+                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                                    />
+                                                </div>
+                                                
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">GitHub Profile</label>
+                                                    <input
+                                                        type="url"
+                                                        name="github"
+                                                        value={formData.github}
+                                                        onChange={handleInputChange}
+                                                        placeholder="https://github.com/yourusername"
+                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Portfolio Website</label>
+                                                    <input
+                                                        type="url"
+                                                        name="portfolio_link"
+                                                        value={formData.portfolio_link}
+                                                        onChange={handleInputChange}
+                                                        placeholder="https://yourportfolio.com"
+                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                                    />
+                                                </div>
+                                                
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
+                                                    <select
+                                                        name="years_of_experience"
+                                                        value={formData.years_of_experience}
+                                                        onChange={handleInputChange}
+                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                                    >
+                                                        <option value="">Select experience</option>
+                                                        <option value="0">Fresher</option>
+                                                        <option value="0.5">6 months</option>
+                                                        <option value="1">1 year</option>
+                                                        <option value="1.5">1.5 years</option>
+                                                        <option value="2">2 years</option>
+                                                        <option value="3">3 years</option>
+                                                        <option value="4">4 years</option>
+                                                        <option value="5+">5+ years</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    value={formData.email}
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Career Objective (Optional)</label>
+                                                <textarea
+                                                    name="objective"
+                                                    value={formData.objective}
                                                     onChange={handleInputChange}
-                                                    placeholder="your.email@example.com"
-                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                                    rows="3"
+                                                    placeholder="Brief description of your career goals and what you're looking for..."
+                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
                                                 />
                                             </div>
                                         </div>
@@ -308,20 +470,8 @@ Here is the user input: ${stringifyCompleted}`
                                 {step === 2 && (
                                     <div className="space-y-6">
                                         <div className="text-center mb-6 sm:mb-8">
-                                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Technical Skills</h2>
-                                            <p className="text-gray-600 mt-2 text-sm sm:text-base">Select the technologies you're proficient in</p>
-                                        </div>
-                                        
-                                        <div className="mb-6">
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Portfolio Link (Optional)</label>
-                                            <input
-                                                type="url"
-                                                name="portfolio_link"
-                                                value={formData.portfolio_link}
-                                                onChange={handleInputChange}
-                                                placeholder="https://your-portfolio.com"
-                                                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                                            />
+                                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Skills</h2>
+                                            <p className="text-gray-600 mt-2 text-sm sm:text-base">Select your technical skills and add soft skills</p>
                                         </div>
                                         
                                         <div>
@@ -345,6 +495,33 @@ Here is the user input: ${stringifyCompleted}`
                                                 ))}
                                             </div>
                                         </div>
+
+                                        <div className="mt-8">
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Soft Skills</label>
+                                            <textarea
+                                                name="soft_skills"
+                                                value={formData.soft_skills}
+                                                onChange={handleInputChange}
+                                                rows="3"
+                                                placeholder="e.g., Leadership, Communication, Problem Solving, Team Collaboration, Time Management, Critical Thinking"
+                                                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                            />
+                                            <p className="text-xs text-gray-500 mt-2">
+                                                List your soft skills separated by commas
+                                            </p>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+                                            <input
+                                                type="text"
+                                                name="languages"
+                                                value={formData.languages}
+                                                onChange={handleInputChange}
+                                                placeholder="e.g., English (Fluent), Hindi (Native), Spanish (Intermediate)"
+                                                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+                                            />
+                                        </div>
                                     </div>
                                 )}
 
@@ -352,7 +529,7 @@ Here is the user input: ${stringifyCompleted}`
                                 {step === 3 && (
                                     <div className="space-y-6">
                                         <div className="text-center mb-6 sm:mb-8">
-                                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Experience & Awards</h2>
+                                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Work Experience</h2>
                                             <p className="text-gray-600 mt-2 text-sm sm:text-base">Add up to 3 work experiences</p>
                                         </div>
                                         
@@ -397,17 +574,32 @@ Here is the user input: ${stringifyCompleted}`
                                                             </div>
                                                         </div>
                                                         
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                                Duration
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                value={experience.duration}
-                                                                onChange={(e) => handleExperienceChange(index, 'duration', e.target.value)}
-                                                                placeholder="Jan 2023 - Present"
-                                                                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
-                                                            />
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Duration
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={experience.duration}
+                                                                    onChange={(e) => handleExperienceChange(index, 'duration', e.target.value)}
+                                                                    placeholder="Jan 2023 - Present"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Location
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={experience.location}
+                                                                    onChange={(e) => handleExperienceChange(index, 'location', e.target.value)}
+                                                                    placeholder="City, State / Remote"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
                                                         </div>
                                                         
                                                         <div>
@@ -431,76 +623,230 @@ Here is the user input: ${stringifyCompleted}`
                                                 </div>
                                             ))}
                                             
-                                            <div className="border border-gray-200 rounded-lg p-4 sm:p-6">
-                                                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Awards & Achievements</h3>
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                                        List your achievements (Optional)
-                                                    </label>
-                                                    <textarea
-                                                        name="awards"
-                                                        value={formData.awards}
-                                                        onChange={handleInputChange}
-                                                        rows="4"
-                                                        placeholder="• Finalist in Smart India Hackathon 2023&#10;• Employee of the Month - March 2023&#10;• Published research paper on Machine Learning applications&#10;• Led team of 5 developers in successful product launch&#10;• Recognized for outstanding performance in Q4 2022"
-                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
-                                                    />
-                                                    <p className="text-xs text-gray-500 mt-2">
-                                                        Include hackathons, certifications, recognitions, publications, or any notable achievements.
-                                                    </p>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 )}
 
-                                {/* Step 4: Education */}
+                                {/* Step 4: Projects */}
                                 {step === 4 && (
+                                    <div className="space-y-6">
+                                        <div className="text-center mb-6 sm:mb-8">
+                                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Projects</h2>
+                                            <p className="text-gray-600 mt-2 text-sm sm:text-base">Add up to 2 personal or academic projects</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6 sm:space-y-8">
+                                            {formData.projects.map((project, index) => (
+                                                <div key={index} className="border border-gray-200 rounded-lg p-4 sm:p-6 bg-gray-50">
+                                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
+                                                        Project {index + 1} {index === 0 ? '(Required)' : '(Optional)'}
+                                                    </h3>
+                                                    
+                                                    <div className="space-y-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Project Name
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={project.project_name}
+                                                                    onChange={(e) => handleProjectChange(index, 'project_name', e.target.value)}
+                                                                    placeholder="Project Name"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Technologies Used
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={project.technologies}
+                                                                    onChange={(e) => handleProjectChange(index, 'technologies', e.target.value)}
+                                                                    placeholder="React, Node.js, MongoDB"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Duration
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={project.duration}
+                                                                    onChange={(e) => handleProjectChange(index, 'duration', e.target.value)}
+                                                                    placeholder="Jan 2024 - Mar 2024"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    GitHub Link
+                                                                </label>
+                                                                <input
+                                                                    type="url"
+                                                                    value={project.github_link}
+                                                                    onChange={(e) => handleProjectChange(index, 'github_link', e.target.value)}
+                                                                    placeholder="https://github.com/..."
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Live Demo Link
+                                                                </label>
+                                                                <input
+                                                                    type="url"
+                                                                    value={project.live_link}
+                                                                    onChange={(e) => handleProjectChange(index, 'live_link', e.target.value)}
+                                                                    placeholder="https://yourproject.com"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                Project Description
+                                                            </label>
+                                                            <textarea
+                                                                value={project.description}
+                                                                onChange={(e) => handleProjectChange(index, 'description', e.target.value)}
+                                                                rows="4"
+                                                                placeholder="Describe your project, what it does, key features, and your role in building it..."
+                                                                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white resize-none text-sm sm:text-base"
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Step 5: Education */}
+                                {step === 5 && (
                                     <div className="space-y-6">
                                         <div className="text-center mb-6 sm:mb-8">
                                             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Education</h2>
                                             <p className="text-gray-600 mt-2 text-sm sm:text-base">Your academic background</p>
                                         </div>
                                         
-                                        <div className="space-y-4">
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">College/University</label>
-                                                    <input
-                                                        type="text"
-                                                        name="college_name"
-                                                        value={formData.college_name}
-                                                        onChange={handleInputChange}
-                                                        placeholder="Institution Name"
-                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                                                    />
+                                        <div className="space-y-6 sm:space-y-8">
+                                            {formData.education.map((edu, index) => (
+                                                <div key={index} className="border border-gray-200 rounded-lg p-4 sm:p-6 bg-gray-50">
+                                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
+                                                        Education {index + 1} {index === 0 ? '(Required)' : '(Optional)'}
+                                                    </h3>
+                                                    
+                                                    <div className="space-y-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    College/University
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.college_name}
+                                                                    onChange={(e) => handleEducationChange(index, 'college_name', e.target.value)}
+                                                                    placeholder="Institution Name"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Degree
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.degree_name}
+                                                                    onChange={(e) => handleEducationChange(index, 'degree_name', e.target.value)}
+                                                                    placeholder="B.Tech, B.Sc, M.Tech, etc."
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Branch/Specialization
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.branch}
+                                                                    onChange={(e) => handleEducationChange(index, 'branch', e.target.value)}
+                                                                    placeholder="Computer Science, Electronics, etc."
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Duration
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.duration}
+                                                                    onChange={(e) => handleEducationChange(index, 'duration', e.target.value)}
+                                                                    placeholder="Aug 2020 - May 2024"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    Location
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.location}
+                                                                    onChange={(e) => handleEducationChange(index, 'location', e.target.value)}
+                                                                    placeholder="City, State"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+
+                                                            <div>
+                                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                    CGPA/Percentage
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={edu.cgpa}
+                                                                    onChange={(e) => handleEducationChange(index, 'cgpa', e.target.value)}
+                                                                    placeholder="8.5/10 or 85%"
+                                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                                />
+                                                            </div>
+                                                        </div>
+
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                                Relevant Coursework (Optional)
+                                                            </label>
+                                                            <input
+                                                                type="text"
+                                                                value={edu.relevant_coursework}
+                                                                onChange={(e) => handleEducationChange(index, 'relevant_coursework', e.target.value)}
+                                                                placeholder="Data Structures, Algorithms, Database Systems, Machine Learning"
+                                                                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm sm:text-base"
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-2">Degree</label>
-                                                    <input
-                                                        type="text"
-                                                        name="degree_name"
-                                                        value={formData.degree_name}
-                                                        onChange={handleInputChange}
-                                                        placeholder="B.Tech, B.Sc, etc."
-                                                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                                                    />
-                                                </div>
-                                            </div>
-                                            
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
-                                                <input
-                                                    type="text"
-                                                    name="edmon"
-                                                    value={formData.edmon}
-                                                    onChange={handleInputChange}
-                                                    placeholder="Aug 2020 - May 2024"
-                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-                                                />
-                                            </div>
-                                            
+                                            ))}
+
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Work Mode</label>
                                                 <select
@@ -514,6 +860,48 @@ Here is the user input: ${stringifyCompleted}`
                                                     <option value="onsite">On-site</option>
                                                     <option value="hybrid">Hybrid</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Step 6: Additional Info */}
+                                {step === 6 && (
+                                    <div className="space-y-6">
+                                        <div className="text-center mb-6 sm:mb-8">
+                                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Additional Information</h2>
+                                            <p className="text-gray-600 mt-2 text-sm sm:text-base">Awards, certifications, and achievements</p>
+                                        </div>
+                                        
+                                        <div className="space-y-6">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Awards & Achievements</label>
+                                                <textarea
+                                                    name="awards"
+                                                    value={formData.awards}
+                                                    onChange={handleInputChange}
+                                                    rows="4"
+                                                    placeholder="• Finalist in Smart India Hackathon 2023&#10;• Employee of the Month - March 2023&#10;• Published research paper on Machine Learning applications&#10;• Led team of 5 developers in successful product launch"
+                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                                />
+                                                <p className="text-xs text-gray-500 mt-2">
+                                                    Include hackathons, recognitions, publications, or any notable achievements.
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Certifications</label>
+                                                <textarea
+                                                    name="certifications"
+                                                    value={formData.certifications}
+                                                    onChange={handleInputChange}
+                                                    rows="4"
+                                                    placeholder="• AWS Certified Solutions Architect&#10;• Google Cloud Professional Developer&#10;• Microsoft Azure Fundamentals&#10;• Oracle Java SE 11 Developer"
+                                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm sm:text-base"
+                                                />
+                                                <p className="text-xs text-gray-500 mt-2">
+                                                    List your professional certifications and courses completed.
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -534,11 +922,11 @@ Here is the user input: ${stringifyCompleted}`
                                     </button>
                                     
                                     <div className="text-sm text-gray-500 order-first sm:order-none">
-                                        Step {step} of 4
+                                        Step {step} of 6
                                     </div>
                                     
                                     <button
-                                        onClick={step===4 ?handleSubmit:handleNext}
+                                        onClick={step===6 ?handleSubmit:handleNext}
                                         disabled={!canProceed}
                                         className={`w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all text-sm sm:text-base ${
                                             canProceed
@@ -546,7 +934,7 @@ Here is the user input: ${stringifyCompleted}`
                                                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                         }`}
                                     >
-                                        {step === 4 ? 'Create Resume' : 'Next →'}
+                                        {step === 6 ? 'Create Resume' : 'Next →'}
                                     </button>
                                 </div>
                             </div>
